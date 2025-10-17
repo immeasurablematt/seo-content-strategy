@@ -1,0 +1,9 @@
+# DataForSEO API Credentials
+# Get these from https://app.dataforseo.com/
+DATAFORSEO_LOGIN=your_dataforseo_login
+DATAFORSEO_PASSWORD=your_dataforseo_password
+
+# Anthropic API Key for Claude
+# Get this from https://console.anthropic.com/
+ANTHROPIC_API_KEY=your_anthropic_api_key
+
