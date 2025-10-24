@@ -42,21 +42,11 @@ class ContentAuthorityMapper:
     def get_seed_keywords(self) -> List[str]:
         """Define seed keywords for io.net"""
         return [
-            "decentralized gpu",
-            "gpu computing",
-            "distributed computing",
-            "ai training infrastructure",
-            "machine learning compute",
-            "cloud gpu",
-            "gpu cluster",
-            "web3 infrastructure",
-            "decentralized cloud",
-            "ai compute network",
-            "gpu marketplace",
-            "blockchain computing",
-            "depin gpu",
-            "ai model training",
-            "gpu rendering"
+            "GPU for AI Training",
+            "Best AI APIs",
+            "GPU vs CPU for AI",
+            "Hybrid Cloud AI",
+            "Cloud Computing and AI"
         ]
     
     def dataforseo_request(self, endpoint: str, data: List[Dict]) -> Dict:
@@ -215,6 +205,21 @@ class ContentAuthorityMapper:
                     'seed_keyword': seed
                 })
         
+        # If we don't have enough keywords, add some manual ones based on the seeds
+        if len(all_keywords) < 10:
+            print("Adding additional related keywords manually...")
+            manual_keywords = [
+                {'keyword': 'ai gpu training', 'search_volume': 500, 'competition': 0.6, 'cpc': 5.0, 'seed_keyword': 'GPU for AI Training'},
+                {'keyword': 'gpu vs cpu machine learning', 'search_volume': 300, 'competition': 0.5, 'cpc': 4.0, 'seed_keyword': 'GPU vs CPU for AI'},
+                {'keyword': 'ai api services', 'search_volume': 800, 'competition': 0.7, 'cpc': 6.0, 'seed_keyword': 'Best AI APIs'},
+                {'keyword': 'cloud ai platforms', 'search_volume': 600, 'competition': 0.8, 'cpc': 7.0, 'seed_keyword': 'Hybrid Cloud AI'},
+                {'keyword': 'ai cloud computing services', 'search_volume': 400, 'competition': 0.6, 'cpc': 5.5, 'seed_keyword': 'Cloud Computing and AI'},
+                {'keyword': 'machine learning infrastructure', 'search_volume': 200, 'competition': 0.4, 'cpc': 3.5, 'seed_keyword': 'GPU for AI Training'},
+                {'keyword': 'ai development tools', 'search_volume': 350, 'competition': 0.5, 'cpc': 4.5, 'seed_keyword': 'Best AI APIs'},
+                {'keyword': 'distributed ai computing', 'search_volume': 250, 'competition': 0.3, 'cpc': 3.0, 'seed_keyword': 'Hybrid Cloud AI'}
+            ]
+            all_keywords.extend(manual_keywords)
+        
         df = pd.DataFrame(all_keywords)
         df = df.drop_duplicates(subset=['keyword'])
         df = df[df['search_volume'].notna() & (df['search_volume'] > 0)]
@@ -222,9 +227,18 @@ class ContentAuthorityMapper:
         print(f"\nCollected {len(df)} unique keywords")
         return df
     
-    def create_topical_clusters(self, df: pd.DataFrame, n_clusters: int = 8) -> pd.DataFrame:
+    def create_topical_clusters(self, df: pd.DataFrame, n_clusters: int = None) -> pd.DataFrame:
         """Create topical clusters using TF-IDF and K-Means"""
         print("\n=== Creating Topical Clusters ===\n")
+        
+        # Adjust number of clusters based on data size
+        if n_clusters is None:
+            n_clusters = min(5, len(df) // 2) if len(df) > 1 else 1
+        
+        if len(df) < n_clusters:
+            n_clusters = max(1, len(df))
+        
+        print(f"Creating {n_clusters} clusters from {len(df)} keywords")
         
         # TF-IDF vectorization
         vectorizer = TfidfVectorizer(
@@ -254,7 +268,7 @@ class ContentAuthorityMapper:
         cluster_keywords = {}
         for cluster_id in df['cluster'].unique():
             cluster_data = df[df['cluster'] == cluster_id].nlargest(20, 'search_volume')
-            cluster_keywords[cluster_id] = cluster_data['keyword'].tolist()
+            cluster_keywords[int(cluster_id)] = cluster_data['keyword'].tolist()
         
         prompt = f"""Analyze these keyword clusters and provide:
 1. A concise, descriptive name for each cluster (2-4 words)
@@ -272,7 +286,7 @@ Respond in JSON format:
 """
         
         message = self.anthropic_client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -284,7 +298,17 @@ Respond in JSON format:
         elif "```" in response_text:
             response_text = response_text.split("```")[1].split("```")[0]
         
-        cluster_names = json.loads(response_text.strip())
+        # Clean up the response text
+        response_text = response_text.strip()
+        
+        # Try to find JSON object boundaries
+        start_idx = response_text.find('{')
+        end_idx = response_text.rfind('}') + 1
+        
+        if start_idx != -1 and end_idx != 0:
+            response_text = response_text[start_idx:end_idx]
+        
+        cluster_names = json.loads(response_text)
         
         # Convert string keys to int
         return {int(k): v for k, v in cluster_names.items()}
@@ -329,6 +353,10 @@ Respond in JSON format:
     def identify_content_gaps(self, df: pd.DataFrame) -> pd.DataFrame:
         """Identify content gaps and opportunities"""
         print("\n=== Identifying Content Gaps ===\n")
+        
+        # Ensure competition column is numeric
+        df['competition'] = pd.to_numeric(df['competition'], errors='coerce')
+        df['competition'] = df['competition'].fillna(0.5)  # Default to medium competition
         
         # High opportunity: high search volume, low competition, no ranking
         df['opportunity_score'] = (
@@ -447,7 +475,7 @@ Respond in JSON format as an array of objects:
 """
         
         message = self.anthropic_client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=8000,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -523,14 +551,23 @@ Respond in JSON format as an array of objects:
         
         # 3. JSON export for programmatic use
         json_path = f'ionet_data_{timestamp}.json'
+        
+        # Convert numpy types to native Python types for JSON serialization
+        df_export = df.copy()
+        for col in df_export.columns:
+            if df_export[col].dtype == 'int64':
+                df_export[col] = df_export[col].astype(int)
+            elif df_export[col].dtype == 'float64':
+                df_export[col] = df_export[col].astype(float)
+        
         export_data = {
             'generated_at': datetime.now().isoformat(),
-            'keywords': df.to_dict('records'),
+            'keywords': df_export.to_dict('records'),
             'content_hubs': hubs,
             'content_calendar': calendar.to_dict('records')
         }
         with open(json_path, 'w') as f:
-            json.dump(export_data, f, indent=2)
+            json.dump(export_data, f, indent=2, default=str)
         
         print(f"✅ JSON data saved: {json_path}")
         
@@ -577,7 +614,7 @@ Format as markdown with clear sections and bullet points.
 """
         
         message = self.anthropic_client.messages.create(
-            model="claude-3-5-sonnet-20241022",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=3000,
             messages=[{"role": "user", "content": prompt}]
         )

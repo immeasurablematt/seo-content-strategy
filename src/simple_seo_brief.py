@@ -1,11 +1,25 @@
 """
-Simple SEO Content Brief Generator (No CrewAI)
+SEO Content Brief Generator
 
-This script generates an SEO content brief by:
-1. Calling DataForSEO API for keyword metrics
-2. Calling DataForSEO API for SERP analysis
-3. Using Claude (Anthropic) to synthesize insights into a comprehensive brief
-4. Saving the final brief as a markdown file
+This script generates comprehensive, data-driven SEO content briefs by:
+1. Analyzing target keyword metrics and search volume
+2. Examining top-ranking pages (SERP analysis) 
+3. Measuring competitor content length and domain authority
+4. Identifying target audience based on competitor patterns
+5. Recommending content approach, word count, and structure
+6. Creating comprehensive brief with all research and recommendations
+
+The brief includes 10 comprehensive sections:
+- Executive Summary, Keyword Strategy, Search Intent Analysis
+- Competitor Analysis, Content Structure, Content Requirements
+- Internal Linking Strategy, Technical SEO, Unique Value Proposition
+- Success Metrics
+
+Input Requirements:
+- Primary Keyword (required): The main keyword to target
+- Target Audience (optional): Specific audience to target (auto-detected if not provided)
+- Content Goal (optional): The purpose of the content (auto-detected if not provided)  
+- Domain (optional): Your website domain for competitive comparison
 
 No complex dependencies - just requests, anthropic, and dotenv.
 """
@@ -199,23 +213,17 @@ def get_domain_metrics(domains):
                                 print(f"     [DEBUG] Metrics item: {json.dumps(metrics_item, indent=2)[:800]}")
                             
                             if domain:
-                                # Extract key domain authority indicators from metrics
+                                # Store the full metrics structure for compatibility
+                                domain_metrics[domain] = metrics_item
+                                
+                                # Extract key metrics for display
                                 metrics = metrics_item.get("metrics", {})
                                 organic = metrics.get("organic", {})
+                                pos_1 = organic.get("pos_1", 0)
+                                keywords = organic.get("count", 0)
+                                etv = organic.get("etv", 0)
                                 
-                                domain_metrics[domain] = {
-                                    "pos_1": organic.get("pos_1", 0),
-                                    "pos_2_3": organic.get("pos_2_3", 0),
-                                    "pos_4_10": organic.get("pos_4_10", 0),
-                                    "keywords": organic.get("count", 0),
-                                    "etv": organic.get("etv", 0),
-                                    "traffic_cost": organic.get("estimated_paid_traffic_cost", 0),
-                                    "is_new": organic.get("is_new", 0),
-                                    "is_up": organic.get("is_up", 0),
-                                    "is_down": organic.get("is_down", 0)
-                                }
-                                
-                                print(f"     ✓ pos_1: {domain_metrics[domain]['pos_1']:,}, keywords: {domain_metrics[domain]['keywords']:,}, etv: ${domain_metrics[domain]['etv']:,.0f}")
+                                print(f"     ✓ pos_1: {pos_1:,}, keywords: {keywords:,}, etv: ${etv:,.0f}")
                         else:
                             print(f"     [DEBUG] No items data for {domain}")
                     else:
@@ -318,8 +326,27 @@ def get_serp_results(keyword, your_domain="io.net"):
                 # Second pass: add domain metrics to each result
                 for result in formatted_results:
                     domain = result.get("domain")
-                    if domain and domain in domain_metrics:
-                        result["domain_metrics"] = domain_metrics[domain]
+                    if domain:
+                        # Try exact match first
+                        if domain in domain_metrics:
+                            result["domain_metrics"] = domain_metrics[domain]
+                            result["domain_authority"] = domain_metrics[domain]
+                        else:
+                            # Try cleaned domain match
+                            clean_domain = domain.replace('www.', '').replace('https://', '').replace('http://', '').split('/')[0]
+                            if clean_domain in domain_metrics:
+                                result["domain_metrics"] = domain_metrics[clean_domain]
+                                result["domain_authority"] = domain_metrics[clean_domain]
+                
+                # Ensure your domain has DA data even if not in SERP results
+                your_domain_metrics = {}
+                if your_domain in domain_metrics:
+                    your_domain_metrics = domain_metrics[your_domain]
+                else:
+                    # Try cleaned domain match for your domain
+                    clean_your_domain = your_domain.replace('www.', '').replace('https://', '').replace('http://', '').split('/')[0]
+                    if clean_your_domain in domain_metrics:
+                        your_domain_metrics = domain_metrics[clean_your_domain]
                 
                 return {
                     "keyword": keyword,
@@ -327,7 +354,7 @@ def get_serp_results(keyword, your_domain="io.net"):
                     "results": formatted_results,
                     "domain_metrics": domain_metrics,
                     "your_domain": your_domain,
-                    "your_domain_metrics": domain_metrics.get(your_domain, {})
+                    "your_domain_metrics": your_domain_metrics
                 }
             else:
                 print("⚠️  No SERP results found")
@@ -444,7 +471,7 @@ OUTPUT FORMAT (JSON only):
 
     try:
         response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=3000,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -494,7 +521,7 @@ OUTPUT FORMAT (JSON only):
 
 def get_actual_word_count(url, timeout=10):
     """
-    Fetch a URL and count the actual words in the main content
+    Fetch a URL and count the actual words in the main content with robust error handling
     
     Args:
         url (str): URL to fetch
@@ -507,7 +534,16 @@ def get_actual_word_count(url, timeout=10):
         from bs4 import BeautifulSoup
         
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1',
+            'Sec-Fetch-Dest': 'document',
+            'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Cache-Control': 'max-age=0'
         }
         
         response = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True)
@@ -521,7 +557,7 @@ def get_actual_word_count(url, timeout=10):
         
         # Try to find main content area (common selectors)
         main_content = None
-        for selector in ['article', 'main', '[role="main"]', '.content', '#content', '.post', '.entry-content']:
+        for selector in ['article', 'main', '[role="main"]', '.content', '#content', '.post', '.entry-content', '.blog-content', '.article-content']:
             main_content = soup.select_one(selector)
             if main_content:
                 break
@@ -533,52 +569,268 @@ def get_actual_word_count(url, timeout=10):
         if main_content:
             text = main_content.get_text(separator=' ', strip=True)
             words = text.split()
-            word_count = len([w for w in words if len(w) > 0])
+            # Filter out very short words and numbers for more accurate count
+            meaningful_words = [w for w in words if len(w) > 2 and not w.isdigit()]
+            word_count = len(meaningful_words)
             return word_count
         
         return None
         
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            print(f"     ⚠️  403 Forbidden - trying alternative method...")
+            return get_word_count_alternative_method(url)
+        else:
+            print(f"     ⚠️  HTTP Error {e.response.status_code}: {str(e)[:50]}")
+            return None
     except Exception as e:
         print(f"     ⚠️  Failed to fetch: {str(e)[:50]}")
         return None
 
 
-def estimate_content_length(serp_results):
+def get_word_count_alternative_method(url, timeout=10):
     """
-    Fetch competitor pages and count actual word counts
-    
-    Analyzes only the top 4 results for efficiency and relevance.
+    Alternative method to get word count when direct scraping fails
+    """
+    try:
+        from bs4 import BeautifulSoup
+        
+        # Method 1: Try with different headers
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/119.0',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'Connection': 'keep-alive',
+            'Upgrade-Insecure-Requests': '1'
+        }
+        
+        response = requests.get(url, headers=headers, timeout=timeout, allow_redirects=True)
+        response.raise_for_status()
+        
+        soup = BeautifulSoup(response.content, 'html.parser')
+        
+        # Remove script, style, nav, footer, header elements
+        for element in soup(['script', 'style', 'nav', 'footer', 'header', 'aside', 'form', 'iframe']):
+            element.decompose()
+        
+        # Try to find main content area
+        main_content = None
+        for selector in ['article', 'main', '[role="main"]', '.content', '#content', '.post', '.entry-content', '.blog-content', '.article-content']:
+            main_content = soup.select_one(selector)
+            if main_content:
+                break
+        
+        if not main_content:
+            main_content = soup.body
+        
+        if main_content:
+            text = main_content.get_text(separator=' ', strip=True)
+            words = text.split()
+            meaningful_words = [w for w in words if len(w) > 2 and not w.isdigit()]
+            word_count = len(meaningful_words)
+            return word_count
+        
+        return None
+        
+    except Exception as e:
+        print(f"     ⚠️  Alternative method failed: {str(e)[:50]}")
+        return None
+
+
+def filter_realistic_competitors(serp_results, your_domain="io.net", max_da_gap=10):
+    """
+    Filter competitors based on realistic DA gaps
     
     Args:
-        serp_results (dict): SERP results with URLs
+        serp_results (dict): SERP results with domain authority data
+        your_domain (str): Your domain for comparison
+        max_da_gap (int): Maximum DA gap multiplier (e.g., 10 = 10x stronger)
+        
+    Returns:
+        tuple: (realistic_competitors, unrealistic_competitors)
+    """
+    print(f"\n🎯 Filtering competitors based on realistic DA gaps...")
+    
+    # Get your domain's DA from your_domain_metrics
+    your_da = None
+    your_domain_metrics = serp_results.get("your_domain_metrics", {})
+    if "metrics" in your_domain_metrics and "organic" in your_domain_metrics["metrics"]:
+        your_da = your_domain_metrics["metrics"]["organic"].get("pos_1", 0)
+    
+    if not your_da:
+        print(f"   ⚠️  Could not find DA for {your_domain}, using all competitors")
+        return serp_results.get("results", []), []
+    
+    print(f"   📊 Your domain ({your_domain}) DA: {your_da:,} #1 rankings")
+    
+    realistic_competitors = []
+    unrealistic_competitors = []
+    
+    for result in serp_results.get("results", []):
+        da_data = result.get("domain_authority", {})
+        competitor_da = 0
+        if "metrics" in da_data and "organic" in da_data["metrics"]:
+            competitor_da = da_data["metrics"]["organic"].get("pos_1", 0)
+        
+        if competitor_da == 0:
+            # If no DA data, assume it's realistic (smaller sites)
+            realistic_competitors.append(result)
+            continue
+            
+        da_gap = competitor_da / your_da if your_da > 0 else float('inf')
+        
+        if da_gap <= max_da_gap:
+            realistic_competitors.append(result)
+            print(f"   ✅ {result.get('domain', 'Unknown')}: {competitor_da:,} #1 rankings (DA gap: {da_gap:.1f}x) - REALISTIC")
+        else:
+            unrealistic_competitors.append(result)
+            print(f"   ❌ {result.get('domain', 'Unknown')}: {competitor_da:,} #1 rankings (DA gap: {da_gap:.1f}x) - UNREALISTIC")
+    
+    print(f"   📈 Found {len(realistic_competitors)} realistic competitors out of {len(serp_results.get('results', []))}")
+    
+    return realistic_competitors, unrealistic_competitors
+
+
+def analyze_competition_realism(serp_results, your_domain="io.net"):
+    """
+    Analyze if competition is realistic for your domain
+    
+    Args:
+        serp_results (dict): SERP results with domain authority data
+        your_domain (str): Your domain for comparison
+        
+    Returns:
+        dict: Competition realism analysis
+    """
+    print(f"\n🔍 Analyzing competition realism for {your_domain}...")
+    
+    # Get your domain's DA from your_domain_metrics
+    your_da = None
+    your_domain_metrics = serp_results.get("your_domain_metrics", {})
+    if "metrics" in your_domain_metrics and "organic" in your_domain_metrics["metrics"]:
+        your_da = your_domain_metrics["metrics"]["organic"].get("pos_1", 0)
+    
+    if not your_da:
+        print(f"   ⚠️  Could not find DA for {your_domain}")
+        return {
+            "error": "Could not find domain authority for your domain",
+            "recommendation": "Manual analysis required"
+        }
+    
+    # Categorize competitors
+    realistic = []
+    challenging = []
+    unrealistic = []
+    
+    for result in serp_results.get("results", []):
+        da_data = result.get("domain_authority", {})
+        competitor_da = 0
+        if "metrics" in da_data and "organic" in da_data["metrics"]:
+            competitor_da = da_data["metrics"]["organic"].get("pos_1", 0)
+        
+        if competitor_da == 0:
+            # Assume smaller sites are realistic
+            realistic.append(result)
+            continue
+            
+        da_gap = competitor_da / your_da if your_da > 0 else float('inf')
+        
+        if da_gap < 5:
+            realistic.append(result)
+        elif da_gap < 20:
+            challenging.append(result)
+        else:
+            unrealistic.append(result)
+    
+    # Generate recommendations
+    if len(realistic) >= 3:
+        recommendation = "Focus on realistic competitors for achievable wins"
+        strategy = "Short-term strategy with realistic targets"
+    elif len(challenging) >= 3:
+        recommendation = "Long-term strategy needed, focus on content gaps"
+        strategy = "Medium-term strategy with content differentiation"
+    else:
+        recommendation = "Consider alternative keywords or content clusters"
+        strategy = "Alternative keyword strategy recommended"
+    
+    analysis = {
+        "your_da": your_da,
+        "realistic_competitors": realistic,
+        "challenging_competitors": challenging,
+        "unrealistic_competitors": unrealistic,
+        "recommendation": recommendation,
+        "strategy": strategy,
+        "total_competitors": len(serp_results.get("results", [])),
+        "realistic_percentage": (len(realistic) / len(serp_results.get("results", []))) * 100 if serp_results.get("results") else 0
+    }
+    
+    print(f"   📊 Competition Analysis:")
+    print(f"   - Realistic competitors: {len(realistic)}")
+    print(f"   - Challenging competitors: {len(challenging)}")
+    print(f"   - Unrealistic competitors: {len(unrealistic)}")
+    print(f"   - Strategy: {strategy}")
+    
+    return analysis
+
+
+def estimate_content_length(serp_results, your_domain="io.net", max_da_gap=10):
+    """
+    Fetch competitor pages and count actual word counts using realistic competitors only
+    
+    Analyzes only realistic competitors based on DA gaps for more accurate recommendations.
+    
+    Args:
+        serp_results (dict): SERP results with URLs and domain authority data
+        your_domain (str): Your domain for comparison
+        max_da_gap (int): Maximum DA gap multiplier for realistic competitors
         
     Returns:
         dict: Word count analysis and statistics
     """
-    print(f"\n📏 Fetching top 4 competitor pages and counting words...")
+    print(f"\n📏 Analyzing content length using realistic competitors only...")
+    
+    # Filter to realistic competitors only
+    realistic_competitors, unrealistic_competitors = filter_realistic_competitors(
+        serp_results, your_domain, max_da_gap
+    )
+    
+    if len(realistic_competitors) < 2:
+        print(f"   ⚠️  Only {len(realistic_competitors)} realistic competitors found")
+        print(f"   📊 Falling back to all competitors for analysis")
+        competitors_to_analyze = serp_results.get("results", [])[:4]
+        analysis_type = "all_competitors"
+    else:
+        print(f"   ✅ Analyzing {len(realistic_competitors)} realistic competitors")
+        competitors_to_analyze = realistic_competitors[:4]  # Top 4 realistic competitors
+        analysis_type = "realistic_competitors"
     
     word_counts = []
     detailed_estimates = []
     
-    # Only analyze top 4 results
-    for result in serp_results.get("results", [])[:4]:
+    # Analyze selected competitors
+    for result in competitors_to_analyze:
         position = result.get("position", 999)
         title = result.get("title", "")
         url = result.get("url", "")
         domain = result.get("domain", "")
+        da_data = result.get("domain_authority", {})
+        competitor_da = 0
+        if "metrics" in da_data and "organic" in da_data["metrics"]:
+            competitor_da = da_data["metrics"]["organic"].get("pos_1", 0)
         
-        print(f"   - Position #{position} ({domain})...")
+        print(f"   - Position #{position} ({domain}) - DA: {competitor_da:,} #1 rankings...")
         
         # Fetch and count actual words
         actual_words = get_actual_word_count(url)
         
-        if actual_words and actual_words > 100:  # Sanity check
+        if actual_words and actual_words > 100:
             word_count = actual_words
             print(f"     ✓ {word_count:,} words (actual)")
         else:
-            # Fallback: reasonable default if fetch fails
-            word_count = 2000
-            print(f"     ⚠️  Using default: {word_count:,} words (fetch failed)")
+            # More conservative fallback for failed fetches
+            word_count = 1500  # Reduced from 2000
+            print(f"     ⚠️  Using conservative default: {word_count:,} words (fetch failed)")
         
         word_counts.append(word_count)
         detailed_estimates.append({
@@ -586,9 +838,10 @@ def estimate_content_length(serp_results):
             "domain": domain,
             "actual_words": word_count,
             "title": title[:60] + "..." if len(title) > 60 else title,
-            "fetched": actual_words is not None
+            "fetched": actual_words is not None,
+            "domain_authority": competitor_da,
+            "is_realistic": result in realistic_competitors
         })
-        
     
     # Calculate statistics
     if word_counts:
@@ -598,15 +851,16 @@ def estimate_content_length(serp_results):
         min_words = min(word_counts)
         max_words = max(word_counts)
         
-        # Recommend 10-20% more than average of top 4
+        # Recommend 10-20% more than average of realistic competitors
         recommended_min = int(avg_words * 1.1)
         recommended_max = int(avg_words * 1.2)
         
-        print(f"✅ Content length analysis complete (top 4 results)")
+        print(f"✅ Content length analysis complete ({analysis_type})")
         print(f"   - Average: {avg_words:,.0f} words")
         print(f"   - Median: {median_words:,} words")
         print(f"   - Range: {min_words:,} - {max_words:,} words")
         print(f"   - Recommended: {recommended_min:,} - {recommended_max:,} words (10-20% above avg)")
+        print(f"   - Realistic competitors analyzed: {len([e for e in detailed_estimates if e['is_realistic']])}")
         
         return {
             "average": avg_words,
@@ -615,21 +869,27 @@ def estimate_content_length(serp_results):
             "max": max_words,
             "recommended_min": recommended_min,
             "recommended_max": recommended_max,
-            "detailed_estimates": detailed_estimates
+            "detailed_estimates": detailed_estimates,
+            "analysis_type": analysis_type,
+            "realistic_competitors_count": len(realistic_competitors),
+            "unrealistic_competitors_count": len(unrealistic_competitors)
         }
     else:
         return {
-            "average": 3000,
-            "median": 3000,
+            "average": 2000,
+            "median": 2000,
             "min": 1500,
-            "max": 5000,
-            "recommended_min": 3000,
-            "recommended_max": 4000,
-            "detailed_estimates": []
+            "max": 2500,
+            "recommended_min": 2200,
+            "recommended_max": 2400,
+            "detailed_estimates": [],
+            "analysis_type": "fallback",
+            "realistic_competitors_count": 0,
+            "unrealistic_competitors_count": 0
         }
 
 
-def calculate_competition_assessment(your_domain_metrics, competitor_metrics_dict, serp_results):
+def calculate_competition_assessment(your_domain_metrics, competitor_metrics_dict, serp_results, your_domain="io.net"):
     """
     Analyze competition strength and calculate competitiveness assessment
     
@@ -657,7 +917,7 @@ def calculate_competition_assessment(your_domain_metrics, competitor_metrics_dic
     print(f"\n🎯 Calculating competition assessment...")
     
     # First, estimate content lengths
-    content_length_analysis = estimate_content_length(serp_results)
+    content_length_analysis = estimate_content_length(serp_results, your_domain)
     
     # Extract your metrics
     your_pos_1 = your_domain_metrics.get("pos_1", 0)
@@ -893,7 +1153,7 @@ Select pages that:
 
     try:
         response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
+            model="claude-sonnet-4-5-20250929",
             max_tokens=2000,
             messages=[{"role": "user", "content": prompt}]
         )
@@ -925,7 +1185,7 @@ Select pages that:
 
 def generate_content_brief(keyword_metrics, serp_results, primary_keyword, target_audience, content_goal, competition_assessment, internal_links):
     """
-    Use Claude to generate a comprehensive SEO content brief
+    Use Claude to generate a comprehensive SEO content brief following the skill document format
     
     Args:
         keyword_metrics (dict): Keyword data from DataForSEO
@@ -933,11 +1193,13 @@ def generate_content_brief(keyword_metrics, serp_results, primary_keyword, targe
         primary_keyword (str): The target keyword
         target_audience (str): Target audience description
         content_goal (str): Content goal/purpose
+        competition_assessment (dict): Competition analysis data
+        internal_links (list): Recommended internal links
         
     Returns:
         str: Generated content brief in markdown format
     """
-    print(f"\n🤖 Generating content brief with Claude AI...")
+    print(f"\n🤖 Generating comprehensive content brief with Claude AI...")
     
     # Prepare the data for Claude
     keyword_data_str = json.dumps(keyword_metrics, indent=2)
@@ -953,8 +1215,8 @@ def generate_content_brief(keyword_metrics, serp_results, primary_keyword, targe
     recommended_min = content_length.get('recommended_min', 3000)
     recommended_max = content_length.get('recommended_max', 4000)
     
-    # Create the prompt for Claude
-    prompt = f"""You are an expert SEO content strategist. Generate a strategically focused SEO content brief.
+    # Create the comprehensive prompt for Claude following the skill document format
+    prompt = f"""You are an expert SEO content strategist. Generate a comprehensive SEO content brief following the exact 10-section format specified in the skill document.
 
 PRIMARY KEYWORD: {primary_keyword}
 TARGET AUDIENCE: {target_audience}
@@ -963,7 +1225,7 @@ CONTENT GOAL: {content_goal}
 KEYWORD METRICS DATA:
 {keyword_data_str}
 
-SERP ANALYSIS DATA (Top 4 Results):
+SERP ANALYSIS DATA (Top 10 Results):
 {serp_data_str}
 
 COMPETITION DOMAIN AUTHORITY ANALYSIS:
@@ -978,216 +1240,74 @@ RECOMMENDED INTERNAL LINKS:
 
 **CRITICAL INSTRUCTIONS:**
 
-1. PRESERVE ALL STRATEGIC SEO ELEMENTS:
-   - Detailed SERP analysis with URLs, strengths, gaps for top 4 results
-   - Complete H2/H3 structure outline (show subsections)
-   - Keyword placement strategy (where to use primary keyword)
-   - External linking requirements (specific source types)
-   - Content quality signals (E-E-A-T, expertise requirements)
-   - Strategic recommendations from competition data
-   - Prioritized competitor targets with rationale
-   - Call-to-Action strategy (primary, secondary, soft CTAs)
-   - Semantic keywords list
-   - Unique value propositions (specific, not generic)
+Generate a comprehensive content brief with ALL 10 sections as specified in the skill document:
 
-2. FORMAT FOR EFFICIENCY (not cutting substance):
-   - Use tables for SERP comparison and domain metrics
-   - Use structured data format for keyword/audience section
-   - Use bullets for lists
-   - Keep explanations concise but complete
+1. **Executive Summary** - Quick overview, target audience, word count, key insights
+2. **Keyword Strategy** - Primary keyword, variations, LSI keywords, placement recommendations
+3. **Search Intent Analysis** - Primary intent, user expectations, pain points, content format
+4. **Competitor Analysis** - Top 10 ranking pages, domain authority, content length, gaps
+5. **Content Structure Recommendation** - H1, H2 sections, H3 subsections, content flow
+6. **Content Requirements** - Word count, depth expectations, media recommendations
+7. **Internal Linking Strategy** - Related pages, anchor text, placement recommendations
+8. **Technical SEO Recommendations** - Meta templates, URL structure, schema markup
+9. **Unique Value Proposition** - Differentiation, unique angle, additional value
+10. **Success Metrics** - Target keywords, ranking timeframe, traffic expectations
 
-3. REMOVE ONLY:
-   - Generic writing advice ("use professional tone", "clear formatting")
-   - Redundant explanations of the same point
-   - Meta-commentary about the brief
+**USE ACTUAL DATA:**
+- Include real SERP results with URLs, titles, descriptions
+- Use actual domain authority metrics in tables
+- Include specific recommendations from competition analysis
+- Use provided internal links exactly as given
+- Base word count recommendations on actual competitor analysis
 
-4. USE ACTUAL DATA:
-   - Top 4 SERP results with specific URLs, content types, strengths, gaps
-   - Domain metrics in tables with real numbers
-   - Strategic recommendations from competition_data
-   - Internal links exactly as provided
-   - Word count with rationale based on competition verdict
+**FORMAT REQUIREMENTS:**
+- Use tables for comparisons and metrics
+- Use bullet points for lists
+- Include specific URLs and data points
+- Be actionable and specific, not generic
+- Focus on strategic insights and differentiation
 
-**WRITING PROCESS:** Complete sections 2-7 first, THEN write Section 1 (Executive Summary) to summarize the article you just briefed.
-
-Output format:
+Output the complete brief in markdown format with all 10 sections:
 
 # SEO Content Brief: {primary_keyword}
 
 ## 1. Executive Summary
-[Write this LAST after completing sections 2-7. Max 150 words. Summarize: the unique article approach, key differentiators from competitors, main topics covered, and why this content will succeed in ranking and engaging {target_audience}. Remove this instruction in final output.]
+[150 words max - overview of opportunity, target audience, word count range, key strategic insights]
 
-## 2. Keyword & Audience Intelligence
-**Target: 250-300 words. Use structured data format with bullets. MUST include all keyword metrics, monthly trends, semantic keywords, detailed audience profile, intent breakdown, key questions, pain points.**
+## 2. Keyword Strategy
+[Primary keyword and variations, related keywords, LSI keywords, placement recommendations, density guidelines]
 
-**Primary Target:**
-- Keyword: {primary_keyword}
-- Volume: [use actual from data]/mo | CPC: $[actual] | Competition: [level] ([score]/100)
-- Trend: [seasonal pattern from monthly_searches with interpretation - e.g., "Peak in April (590), steady 390-480, indicates budget planning cycles"]
+## 3. Search Intent Analysis
+[Primary search intent, user expectations, pain points, questions users ask, content format that matches intent]
 
-**Audience:** {target_audience}
-- Budget Authority: $[estimated range] infrastructure decisions
-- Primary Intent: [X]% Commercial Investigation / [Y]% Informational / [Z]% Other
-- Key Question: "[what they're trying to solve in their words]"
-- Pain Points: [2-3 specific pain points from their perspective]
+## 4. Competitor Analysis
+[Top 10 ranking pages breakdown, domain authority comparison, content length analysis, structure patterns, gaps and opportunities]
 
-**Secondary Keywords:** [comma-separated list of 5-7 keywords]
+## 5. Content Structure Recommendation
+[Suggested H1, recommended H2 sections with descriptions, H3 subsections, content flow and organization]
 
-**Long-tail Opportunities:** [comma-separated list of 6-8 long-tail variations]
+## 6. Content Requirements
+[Minimum recommended word count, target word count range, content depth expectations, media recommendations, data to include]
 
-**Semantic Keywords:** [comma-separated list for NLP/topic coverage - related terms Google associates]
+## 7. Internal Linking Strategy
+[Related pages to link to, anchor text suggestions, link placement recommendations, topic cluster connections]
 
-## 3. Internal Linking Strategy
-**Target: 100-150 words. Table format. Convert the RECOMMENDED INTERNAL LINKS JSON data into a markdown table with the following columns: Page Title, URL, Suggested Anchor Text. Include ALL links from the data.**
+## 8. Technical SEO Recommendations
+[Meta title template, meta description template, URL structure suggestion, schema markup recommendations, featured snippet optimization]
 
-| Page Title | URL | Suggested Anchor Text |
-|------------|-----|----------------------|
-| [from data] | [from data] | [from data] |
+## 9. Unique Value Proposition
+[How to differentiate from competitors, unique angle or perspective, additional value to provide, content enhancements]
 
-## 4. Competitive Landscape  
-**Target: 500-600 words. CRITICAL: Analyze top 4 SERP results in detail with full URLs, content types, strengths, gaps. Include domain authority table, strategic recommendations (4-5 bullets), and prioritized target list (3 competitors with rationale).**
+## 10. Success Metrics
+[Target keywords to track, expected ranking timeframe, traffic expectations, engagement metrics to monitor]
 
-**SERP Analysis (Top 4):**
-
-**Position #1: "[Exact Title]" - [domain]**
-- **Full URL:** [complete URL from data]
-- **Content Type:** [article/guide/tool/directory/product page]
-- **Focus:** [what page primarily covers]
-- **Strengths:** [what they do well]
-- **Gaps:** [what they're missing]
-
-[Repeat format for positions 2, 3, and 4]
-
-**Common Topics Across Top Results:**
-- [topic 1]
-- [topic 2]
-- [topic 3]
-
-**Content Gap Opportunities:**
-- [specific gap 1 with brief explanation why this is an opportunity]
-- [specific gap 2 with brief explanation]
-- [specific gap 3 with brief explanation]
-
-**Domain Authority Comparison:**
-
-**Your Domain Baseline (io.net):**
-- Pos#1 Keywords: [actual] | Total Keywords: [actual] | ETV: $[actual]
-
-**Competitor Domain Authority:**
-
-| Domain | Position | Pos#1 KW | Total KW | ETV | Strength Score | Difficulty |
-|--------|----------|----------|----------|-----|----------------|------------|
-[Use ACTUAL domain metrics from competition data - include all competitors]
-
-**Competition Assessment:**
-- **Overall Score:** [actual]/100
-- **Verdict:** [actual verdict from data]
-- **Target Position:** [actual target position from data]
-
-**Strategic Recommendations:**
-[List all 4-5 recommendations from competition_data exactly as provided]
-
-**Prioritized Outranking Targets:**
-1. **[domain]** - [specific rationale why easiest based on domain metrics]
-2. **[domain]** - [specific rationale for secondary target]
-3. **[domain]** - [specific rationale for tertiary target]
-
-## 5. Content Strategy & Differentiation
-**Target: 600-700 words. MUST include complete H2/H3 outline, keyword placement strategy, external source requirements, content quality signals, unique elements, and CTA strategy. Be specific, not generic.**
-
-**Content Type:** [guide/article/listicle/comparison - based on gap analysis]
-
-**Recommended Title & Meta:**
-- **H1:** [60 chars max, include {primary_keyword}] (include actual char count)
-- **Meta Title:** [60 chars, keyword prominent] (include char count)
-- **Meta Description:** [155 chars, compelling, include keyword] (include char count)
-- **URL Structure:** [suggested-url-path]
-
-**Article Structure (H2 and H3 Outline):**
-
-**H2:** [Section 1 Title]
-- H3: [Subsection]
-- H3: [Subsection]
-- H3: [Subsection]
-
-**H2:** [Section 2 Title]
-- H3: [Subsection]
-- H3: [Subsection]
-
-[Continue for 6-8 major H2 sections with H3 subsections]
-
-**Target Length:** {recommended_min:.0f}-{recommended_max:.0f} words
-
-**Rationale:** Competitor analysis shows top 4 average {avg_words:.0f} words (range: {min_words:.0f}-{max_words:.0f}). This recommendation is 10-20% above average to ensure comprehensive coverage. Explain why this specific length is appropriate given the competition verdict and topic complexity.
-
-**Keyword Placement Strategy:**
-- **H1:** Include primary keyword exactly
-- **First 100 words:** Use primary keyword once naturally
-- **H2 Headers:** Include keyword variations in [specific number] section headers
-- **URL:** Include primary keyword hyphenated
-- **Meta Elements:** Primary keyword prominent in both title and description
-- **Throughout Content:** Integrate semantic keywords naturally for topical relevance
-- **Density:** Target appropriate percentage for primary keyword (natural, not forced)
-
-**Key Topics to Cover:**
-
-*Must-Have Topics (from SERP analysis):*
-- [topic 1 from competitors]
-- [topic 2 from competitors]
-- [topic 3 from competitors]
-- [additional must-have topics]
-
-*Differentiating Topics (content gaps):*
-- [unique topic 1]: [brief explanation why this is a differentiator]
-- [unique topic 2]: [brief explanation]
-- [unique topic 3]: [brief explanation]
-- [additional differentiating topics]
-
-**Required External Sources:**
-- [Source category]: [specific examples - e.g., "Industry reports: Gartner, IDC, McKinsey GPU market analysis"]
-- [Source category]: [specific examples]
-- [Source category]: [specific examples]
-- [Source category]: [specific examples]
-
-**Content Quality Signals:**
-- [Specific requirement]: [what to include - e.g., "Include actual performance benchmarks with specific numbers"]
-- [Specific requirement]: [what to include]
-- [Specific requirement]: [what to include]
-- Technical depth level: [appropriate level for {target_audience}]
-- E-E-A-T: [specific expertise signals to demonstrate]
-
-**Unique Content Elements (Must Include):**
-- [Specific unique element 1]: [what this is and why it's unique]
-- [Specific unique element 2]: [what this is]
-- [Specific unique element 3]: [what this is]
-
-**Multimedia Requirements:**
-- [Type]: [specific purpose - e.g., "Comparison table: top 5 providers with pricing, GPU specs, performance"]
-- [Type]: [specific purpose]
-- [Type]: [specific purpose]
-
-**Call-to-Action Strategy:**
-- **Primary CTA:** "[specific CTA text]" → [placement location and destination]
-- **Secondary CTA:** "[specific CTA text]" → [placement location and destination]
-- **Soft CTA:** "[specific CTA text]" → [placement location and destination]
-
-**Unique Value Propositions vs. Competitors:**
-- [Specific differentiator 1 based on gap analysis]
-- [Specific differentiator 2]
-- [Specific differentiator 3]
-- [Specific differentiator 4]
-
----
-
-**FINAL STEP:** Go back to Section 1 (Executive Summary) and write a compelling 150-word summary of the article you just outlined. Focus on the unique approach, key differentiators, main topics, and why this will succeed.
-
----"""
+Generate the complete brief now:"""
 
     try:
         # Call Claude API
         message = anthropic_client.messages.create(
-            model="claude-3-5-sonnet-20240620",
-            max_tokens=16000,
+            model="claude-sonnet-4-5-20250929",
+            max_tokens=8000,
             messages=[
                 {"role": "user", "content": prompt}
             ]
@@ -1210,23 +1330,32 @@ Output format:
 # MAIN EXECUTION
 # ============================================================================
 
-def main():
-    """Main execution function"""
+def main(primary_keyword=None, target_audience=None, content_goal=None, your_domain="io.net"):
+    """
+    Main execution function
+    
+    Args:
+        primary_keyword (str, optional): The main keyword to target. If None, uses default.
+        target_audience (str, optional): Specific audience to target. If None, auto-detected.
+        content_goal (str, optional): The purpose of the content. If None, auto-detected.
+        your_domain (str): Your website domain for competitive comparison
+    """
     
     print("=" * 80)
     print("SEO CONTENT BRIEF GENERATOR")
-    print("(Simple Version - No CrewAI)")
     print("=" * 80)
     
     # ========================================================================
-    # CONFIGURATION - MODIFY PRIMARY KEYWORD ONLY
+    # CONFIGURATION
     # ========================================================================
-    primary_keyword = "high performance computing"
+    if not primary_keyword:
+        primary_keyword = "high performance computing"  # Default keyword
     
     print(f"\n📋 Configuration:")
     print(f"   Primary Keyword: {primary_keyword}")
-    print(f"   Target Audience: [Auto-recommended based on competitor analysis]")
-    print(f"   Content Goal: [Auto-recommended based on competitor analysis]")
+    print(f"   Target Audience: {target_audience or '[Auto-recommended based on competitor analysis]'}")
+    print(f"   Content Goal: {content_goal or '[Auto-recommended based on competitor analysis]'}")
+    print(f"   Your Domain: {your_domain}")
     
     # Validate environment variables
     if not ANTHROPIC_API_KEY:
@@ -1249,20 +1378,31 @@ def main():
     print("=" * 80)
     
     # Step 2: Get SERP results with domain metrics
-    serp_results = get_serp_results(primary_keyword, your_domain="io.net")
+    serp_results = get_serp_results(primary_keyword, your_domain=your_domain)
     
     print("\n" + "=" * 80)
     print("STEP 3: AUDIENCE & GOAL RECOMMENDATION")
     print("=" * 80)
     
     # Step 3: Analyze competitors and recommend target audience and content goal
-    audience_goal_recommendation = analyze_competitor_audience_and_goals(
-        serp_results,
-        primary_keyword
-    )
-    
-    target_audience = audience_goal_recommendation.get("target_audience")
-    content_goal = audience_goal_recommendation.get("content_goal")
+    # Only do this if not provided by user
+    if not target_audience or not content_goal:
+        audience_goal_recommendation = analyze_competitor_audience_and_goals(
+            serp_results,
+            primary_keyword
+        )
+        
+        if not target_audience:
+            target_audience = audience_goal_recommendation.get("target_audience")
+        if not content_goal:
+            content_goal = audience_goal_recommendation.get("content_goal")
+    else:
+        # Use provided values
+        audience_goal_recommendation = {
+            "target_audience": target_audience,
+            "content_goal": content_goal,
+            "rationale": "User-specified target audience and content goal"
+        }
     
     print("\n" + "=" * 80)
     print("STEP 4: COMPETITION ASSESSMENT")
@@ -1275,8 +1415,13 @@ def main():
     competition_assessment = calculate_competition_assessment(
         your_domain_metrics,
         domain_metrics,
-        serp_results
+        serp_results,
+        your_domain
     )
+    
+    # Add competition realism analysis
+    competition_realism = analyze_competition_realism(serp_results, your_domain)
+    competition_assessment["competition_realism"] = competition_realism
     
     print("\n" + "=" * 80)
     print("STEP 5: INTERNAL LINKING ANALYSIS")
@@ -1284,7 +1429,9 @@ def main():
     
     # Step 5: Load internal pages and find relevant links
     # Try the actual CSV file first, fallback to template
-    if os.path.exists("Internal-Links-Oct-10- 2025.csv"):
+    if os.path.exists("data/Internal-Links-Oct-10- 2025.csv"):
+        internal_pages = load_internal_pages("data/Internal-Links-Oct-10- 2025.csv")
+    elif os.path.exists("Internal-Links-Oct-10- 2025.csv"):
         internal_pages = load_internal_pages("Internal-Links-Oct-10- 2025.csv")
     else:
         internal_pages = load_internal_pages("io_net_pages.csv")
@@ -1338,7 +1485,8 @@ def main():
 **Target Audience:** {target_audience}  
 **Content Goal:** {content_goal}  
 **Primary Keyword:** {primary_keyword}  
-**Target Length:** {recommended_min:.0f}-{recommended_max:.0f} words
+**Target Length:** {recommended_min:.0f}-{recommended_max:.0f} words  
+**Your Domain:** {your_domain}
 
 **Audience & Goal Rationale:**  
 _{rationale}_
@@ -1358,7 +1506,7 @@ _{rationale}_
 - **CPC:** ${keyword_metrics.get('cpc', 'N/A')}
 
 ### Domain Authority Metrics
-- **Your Domain (io.net):**
+- **Your Domain ({your_domain}):**
   - Pos #1 Keywords: {your_domain_metrics.get('pos_1', 'N/A')}
   - Total Keywords: {your_domain_metrics.get('keywords', 'N/A')}
   - Estimated Traffic Value: ${your_domain_metrics.get('etv', 0):,.0f} (monthly)
@@ -1374,6 +1522,7 @@ _{rationale}_
 - **Generated By:** Claude AI (Anthropic) + DataForSEO
 - **Generation Date:** {datetime.now().strftime("%Y-%m-%d")}
 - **Analysis Includes:** Keyword Research, SERP Analysis, Domain Authority Comparison, Competition Assessment
+- **Brief Format:** 10-section comprehensive brief following SEO best practices
 
 ---
 
@@ -1397,6 +1546,42 @@ _{rationale}_
     print(f"\n🎉 Your SEO content brief is ready: {output_filename}\n")
 
 
+def run_with_parameters(primary_keyword, target_audience=None, content_goal=None, your_domain="io.net"):
+    """
+    Run the SEO content brief generator with specific parameters
+    
+    Args:
+        primary_keyword (str): The main keyword to target
+        target_audience (str, optional): Specific audience to target
+        content_goal (str, optional): The purpose of the content
+        your_domain (str): Your website domain for competitive comparison
+    """
+    main(primary_keyword, target_audience, content_goal, your_domain)
+
+
 if __name__ == "__main__":
-    main()
+    import sys
+    
+    # Check for command line arguments
+    if len(sys.argv) > 1:
+        primary_keyword = sys.argv[1]
+        target_audience = sys.argv[2] if len(sys.argv) > 2 else None
+        content_goal = sys.argv[3] if len(sys.argv) > 3 else None
+        your_domain = sys.argv[4] if len(sys.argv) > 4 else "io.net"
+        
+        print(f"Running with command line arguments:")
+        print(f"  Keyword: {primary_keyword}")
+        print(f"  Audience: {target_audience or 'Auto-detect'}")
+        print(f"  Goal: {content_goal or 'Auto-detect'}")
+        print(f"  Domain: {your_domain}")
+        print()
+        
+        main(primary_keyword, target_audience, content_goal, your_domain)
+    else:
+        # Run with default parameters
+        print("Running with default parameters. Use command line arguments for custom settings:")
+        print("Usage: python simple_seo_brief.py <keyword> [audience] [goal] [domain]")
+        print("Example: python simple_seo_brief.py 'best gaming laptops 2024' 'gaming enthusiasts' 'product review' 'mystore.com'")
+        print()
+        main()
 

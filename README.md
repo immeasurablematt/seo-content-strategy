@@ -63,26 +63,52 @@ DATAFORSEO_PASSWORD=your_password_here
 
 ### 3. Generate Your First Brief
 ```bash
-python generate_brief.py
+python scripts/generate_brief.py
 ```
 
 ## 📁 Project Structure
 
 ```
 seo-content-strategy/
-├── 📄 generate_brief.py          # Main script - generate SEO briefs
-├── 📄 run_analysis.py            # Content authority analysis
-├── 📄 start_web_app.py           # Web interface
 ├── 📄 setup.py                   # First-time setup
 ├── 📄 requirements.txt           # Python dependencies
 ├── 📄 README.md                  # This file
 │
-├── 📁 src/                       # Core functionality
+├── 📁 scripts/                   # Executable scripts
+│   ├── generate_brief.py         # Generate individual SEO briefs
+│   ├── run_analysis.py           # Content authority analysis
+│   ├── batch_enhanced_briefs.py  # Batch brief generation
+│   ├── batch_live_sitemap_briefs.py # Batch with live sitemap
+│   ├── run_brief_with_progress.py # Progress tracking
+│   └── start_web_app.py          # Web interface
+│
+├── 📁 src/                       # Core functionality modules
 │   ├── simple_seo_brief.py       # Brief generation engine
 │   ├── content_authority_mapper.py # Authority analysis
 │   ├── keyword_competitor_analyzer.py # Competitor analysis
 │   ├── advanced_analysis.py      # Extended features
-│   └── streamlit_app.py          # Web interface
+│   ├── streamlit_app.py          # Web interface
+│   ├── enhanced_internal_links.py # Enhanced internal linking
+│   ├── live_sitemap_internal_links.py # Live sitemap integration
+│   ├── updated_simple_seo_brief.py # Updated brief generator
+│   └── improve_brief_generator.py # Enhanced brief generator
+│
+├── 📁 reports/                   # Generated analysis reports
+│   ├── ionet_content_strategy_*.xlsx # Excel reports
+│   ├── ionet_data_*.json         # JSON data exports
+│   └── ionet_executive_summary_*.md # Executive summaries
+│
+├── 📁 generated_briefs/          # Generated SEO briefs
+│   ├── *.md                      # Markdown briefs
+│   └── *.docx                    # Word document briefs
+│
+├── 📁 converters/                # File format conversion tools
+│   ├── convert_brief_to_docx.py  # DOCX conversion utilities
+│   ├── convert_to_docx.py        # Quick DOCX converter
+│   └── enhanced_docx_converter.py # Enhanced formatting
+│
+├── 📁 tests/                     # Test scripts
+│   └── test_live_sitemap.py      # Live sitemap tests
 │
 ├── 📁 config/                    # Configuration
 │   ├── settings.py               # App settings
@@ -94,7 +120,8 @@ seo-content-strategy/
 │
 ├── 📁 docs/                      # Documentation
 │   ├── USAGE_GUIDE.md            # Detailed usage guide
-│   └── README_content_mapper.md  # Content mapper docs
+│   ├── README_content_mapper.md  # Content mapper docs
+│   └── *.md                      # Additional documentation
 │
 ├── 📁 backups/                   # Backup files
 └── 📁 output/                    # Generated reports (auto-created)

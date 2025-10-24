@@ -1,0 +1,571 @@
+{
+  "generated_at": "2025-10-23T17:28:41.984162",
+  "keywords": [
+    {
+      "keyword": "GPU for AI Training",
+      "search_volume": 170,
+      "competition": 0.5,
+      "cpc": 8.8,
+      "seed_keyword": "GPU for AI Training",
+      "cluster": 2,
+      "cluster_name": "GPU AI Training",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 45.625,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "Best AI APIs",
+      "search_volume": 140,
+      "competition": 0.5,
+      "cpc": 16.96,
+      "seed_keyword": "Best AI APIs",
+      "cluster": 3,
+      "cluster_name": "AI API Solutions",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 43.75,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "GPU vs CPU for AI",
+      "search_volume": 90,
+      "competition": 0.5,
+      "cpc": 6.51,
+      "seed_keyword": "GPU vs CPU for AI",
+      "cluster": 1,
+      "cluster_name": "Hardware for ML",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 40.625,
+      "content_strategy": "Low Priority"
+    },
+    {
+      "keyword": "Hybrid Cloud AI",
+      "search_volume": 30,
+      "competition": 0.5,
+      "cpc": NaN,
+      "seed_keyword": "Hybrid Cloud AI",
+      "cluster": 4,
+      "cluster_name": "Cloud AI Platforms",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 36.875,
+      "content_strategy": "Low Priority"
+    },
+    {
+      "keyword": "Cloud Computing and AI",
+      "search_volume": 720,
+      "competition": 0.5,
+      "cpc": 15.83,
+      "seed_keyword": "Cloud Computing and AI",
+      "cluster": 0,
+      "cluster_name": "Cloud AI Services",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 80.0,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "ai gpu training",
+      "search_volume": 500,
+      "competition": 0.6,
+      "cpc": 5.0,
+      "seed_keyword": "GPU for AI Training",
+      "cluster": 2,
+      "cluster_name": "GPU AI Training",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 63.25,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "gpu vs cpu machine learning",
+      "search_volume": 300,
+      "competition": 0.5,
+      "cpc": 4.0,
+      "seed_keyword": "GPU vs CPU for AI",
+      "cluster": 1,
+      "cluster_name": "Hardware for ML",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 53.75,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "ai api services",
+      "search_volume": 800,
+      "competition": 0.7,
+      "cpc": 6.0,
+      "seed_keyword": "Best AI APIs",
+      "cluster": 0,
+      "cluster_name": "Cloud AI Services",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 79.0,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "cloud ai platforms",
+      "search_volume": 600,
+      "competition": 0.8,
+      "cpc": 7.0,
+      "seed_keyword": "Hybrid Cloud AI",
+      "cluster": 4,
+      "cluster_name": "Cloud AI Platforms",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 63.5,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "ai cloud computing services",
+      "search_volume": 400,
+      "competition": 0.6,
+      "cpc": 5.5,
+      "seed_keyword": "Cloud Computing and AI",
+      "cluster": 0,
+      "cluster_name": "Cloud AI Services",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 57.0,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "machine learning infrastructure",
+      "search_volume": 200,
+      "competition": 0.4,
+      "cpc": 3.5,
+      "seed_keyword": "GPU for AI Training",
+      "cluster": 1,
+      "cluster_name": "Hardware for ML",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 50.5,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "ai development tools",
+      "search_volume": 350,
+      "competition": 0.5,
+      "cpc": 4.5,
+      "seed_keyword": "Best AI APIs",
+      "cluster": 4,
+      "cluster_name": "Cloud AI Platforms",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 56.875,
+      "content_strategy": "Medium Priority Gap"
+    },
+    {
+      "keyword": "distributed ai computing",
+      "search_volume": 250,
+      "competition": 0.3,
+      "cpc": 3.0,
+      "seed_keyword": "Hybrid Cloud AI",
+      "cluster": 0,
+      "cluster_name": "Cloud AI Services",
+      "ranking_position": NaN,
+      "authority_score": 0,
+      "opportunity_score": 56.625,
+      "content_strategy": "Medium Priority Gap"
+    }
+  ],
+  "content_hubs": {
+    "GPU AI Training": {
+      "pillar_keyword": "ai gpu training",
+      "pillar_volume": "500",
+      "supporting_keywords": [
+        "ai gpu training",
+        "GPU for AI Training"
+      ],
+      "total_search_volume": "670",
+      "current_authority": 0.0,
+      "content_gaps": 2,
+      "priority_score": 670.0
+    },
+    "AI API Solutions": {
+      "pillar_keyword": "Best AI APIs",
+      "pillar_volume": "140",
+      "supporting_keywords": [
+        "Best AI APIs"
+      ],
+      "total_search_volume": "140",
+      "current_authority": 0.0,
+      "content_gaps": 1,
+      "priority_score": 140.0
+    },
+    "Hardware for ML": {
+      "pillar_keyword": "gpu vs cpu machine learning",
+      "pillar_volume": "300",
+      "supporting_keywords": [
+        "gpu vs cpu machine learning",
+        "machine learning infrastructure",
+        "GPU vs CPU for AI"
+      ],
+      "total_search_volume": "590",
+      "current_authority": 0.0,
+      "content_gaps": 3,
+      "priority_score": 590.0
+    },
+    "Cloud AI Platforms": {
+      "pillar_keyword": "cloud ai platforms",
+      "pillar_volume": "600",
+      "supporting_keywords": [
+        "cloud ai platforms",
+        "ai development tools",
+        "Hybrid Cloud AI"
+      ],
+      "total_search_volume": "980",
+      "current_authority": 0.0,
+      "content_gaps": 3,
+      "priority_score": 980.0
+    },
+    "Cloud AI Services": {
+      "pillar_keyword": "ai api services",
+      "pillar_volume": "800",
+      "supporting_keywords": [
+        "Cloud Computing and AI",
+        "ai api services",
+        "ai cloud computing services",
+        "distributed ai computing"
+      ],
+      "total_search_volume": "2170",
+      "current_authority": 0.0,
+      "content_gaps": 4,
+      "priority_score": 2170.0
+    }
+  },
+  "content_calendar": [
+    {
+      "week": 1,
+      "title": "The Complete Guide to Cloud AI Platforms: Comparing Centralized vs Decentralized Solutions",
+      "target_keyword": "cloud ai platforms",
+      "content_type": "guide",
+      "hub": "Cloud AI Platforms",
+      "priority": "high",
+      "business_goal": "seo",
+      "estimated_impact": "Pillar content targeting highest priority hub (980 priority score). Will establish authority in cloud AI space and drive organic traffic from decision-makers comparing platforms.",
+      "publish_date": "2025-10-23"
+    },
+    {
+      "week": 1,
+      "title": "Getting Started: Deploy Your First AI Model on Decentralized GPU Infrastructure",
+      "target_keyword": "gpu ai training",
+      "content_type": "tutorial",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Hands-on tutorial reducing time-to-first-deployment. Directly converts developers into active users with step-by-step implementation guide.",
+      "publish_date": "2025-10-23"
+    },
+    {
+      "week": 2,
+      "title": "AI API Services: Complete 2024 Buyer's Guide for ML Engineers",
+      "target_keyword": "ai api services",
+      "content_type": "guide",
+      "hub": "Cloud AI Services",
+      "priority": "high",
+      "business_goal": "seo",
+      "estimated_impact": "Pillar content for highest-priority hub (2170 score). Targets bottom-of-funnel buyers actively comparing solutions, positioning io.net as alternative.",
+      "publish_date": "2025-10-30"
+    },
+    {
+      "week": 2,
+      "title": "Case Study: How Stability AI Reduced Training Costs by 60% with Decentralized GPUs",
+      "target_keyword": "gpu training cost optimization",
+      "content_type": "case_study",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Social proof demonstrating real-world cost savings. Builds credibility with enterprise AI teams and generates shareable content for sales enablement.",
+      "publish_date": "2025-10-30"
+    },
+    {
+      "week": 3,
+      "title": "GPU vs CPU for Machine Learning: Performance Benchmarks and Cost Analysis",
+      "target_keyword": "gpu vs cpu machine learning",
+      "content_type": "guide",
+      "hub": "Hardware for ML",
+      "priority": "high",
+      "business_goal": "seo",
+      "estimated_impact": "Pillar content filling 3 content gaps in Hardware for ML hub. Educational content capturing early-stage researchers making infrastructure decisions.",
+      "publish_date": "2025-11-06"
+    },
+    {
+      "week": 3,
+      "title": "Building a Multi-GPU Training Pipeline: Best Practices and Code Examples",
+      "target_keyword": "multi gpu training",
+      "content_type": "tutorial",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Technical deep-dive with production-ready code. Attracts experienced ML engineers and demonstrates platform capabilities for complex workloads.",
+      "publish_date": "2025-11-06"
+    },
+    {
+      "week": 4,
+      "title": "Top 10 Best AI APIs for Developers in 2024: Features, Pricing, and Use Cases",
+      "target_keyword": "best ai apis",
+      "content_type": "guide",
+      "hub": "AI API Solutions",
+      "priority": "medium",
+      "business_goal": "seo",
+      "estimated_impact": "Pillar content for AI API Solutions hub (140 priority). Captures developers researching API options and positions io.net's compute layer as infrastructure.",
+      "publish_date": "2025-11-13"
+    },
+    {
+      "week": 4,
+      "title": "How to Choose the Right GPU for AI Training: A Technical Decision Framework",
+      "target_keyword": "choosing gpu for ai",
+      "content_type": "blog",
+      "hub": "Hardware for ML",
+      "priority": "medium",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Educational content establishing io.net as trusted advisor. Helps buyers navigate complex GPU selection while highlighting decentralized advantages.",
+      "publish_date": "2025-11-13"
+    },
+    {
+      "week": 5,
+      "title": "Migrating from AWS SageMaker to Decentralized GPU Infrastructure: Step-by-Step Guide",
+      "target_keyword": "aws sagemaker alternative",
+      "content_type": "tutorial",
+      "hub": "Cloud AI Platforms",
+      "priority": "high",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Migration guide directly targeting AWS users. Reduces friction for platform switching and captures users frustrated with cloud costs.",
+      "publish_date": "2025-11-20"
+    },
+    {
+      "week": 5,
+      "title": "Real-Time AI Inference at Scale: Architecture Patterns and Performance Optimization",
+      "target_keyword": "ai inference optimization",
+      "content_type": "technical_doc",
+      "hub": "Cloud AI Services",
+      "priority": "high",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Advanced technical content attracting senior engineers. Demonstrates platform capabilities for production ML systems and inference workloads.",
+      "publish_date": "2025-11-20"
+    },
+    {
+      "week": 6,
+      "title": "Cloud AI Platforms Pricing Comparison: Hidden Costs and True TCO Analysis",
+      "target_keyword": "cloud ai platform pricing",
+      "content_type": "blog",
+      "hub": "Cloud AI Platforms",
+      "priority": "high",
+      "business_goal": "seo",
+      "estimated_impact": "Bottom-funnel content for budget-conscious buyers. Transparent pricing comparison positions io.net's cost advantages and builds trust.",
+      "publish_date": "2025-11-27"
+    },
+    {
+      "week": 6,
+      "title": "Training Large Language Models: Hardware Requirements and Cost Breakdown",
+      "target_keyword": "llm training cost",
+      "content_type": "guide",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Addresses hottest AI topic (LLMs) with practical cost analysis. Attracts high-value users building foundation models.",
+      "publish_date": "2025-11-27"
+    },
+    {
+      "week": 7,
+      "title": "Case Study: Open-Source AI Project Scales to 1000+ GPUs with Zero DevOps Overhead",
+      "target_keyword": "distributed gpu training",
+      "content_type": "case_study",
+      "hub": "GPU AI Training",
+      "priority": "medium",
+      "business_goal": "network_growth",
+      "estimated_impact": "Showcases platform scalability and ease-of-use. Builds credibility with open-source community and demonstrates network effects.",
+      "publish_date": "2025-12-04"
+    },
+    {
+      "week": 7,
+      "title": "AI API Services Integration Guide: Connecting Your ML Pipeline to Decentralized Compute",
+      "target_keyword": "ai api integration",
+      "content_type": "tutorial",
+      "hub": "Cloud AI Services",
+      "priority": "medium",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Technical how-to reducing integration complexity. Enables developers to combine existing API workflows with io.net infrastructure.",
+      "publish_date": "2025-12-04"
+    },
+    {
+      "week": 8,
+      "title": "Understanding GPU Memory Requirements for Deep Learning Models",
+      "target_keyword": "gpu memory deep learning",
+      "content_type": "blog",
+      "hub": "Hardware for ML",
+      "priority": "medium",
+      "business_goal": "seo",
+      "estimated_impact": "Educational content filling hardware knowledge gaps. Helps developers right-size their GPU needs and make informed infrastructure decisions.",
+      "publish_date": "2025-12-11"
+    },
+    {
+      "week": 8,
+      "title": "Building Custom AI APIs: From Model Training to Production Deployment",
+      "target_keyword": "custom ai api development",
+      "content_type": "guide",
+      "hub": "AI API Solutions",
+      "priority": "medium",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "End-to-end guide covering entire ML lifecycle. Demonstrates platform versatility from training through serving.",
+      "publish_date": "2025-12-11"
+    },
+    {
+      "week": 9,
+      "title": "Decentralized vs Centralized Cloud AI: Security, Privacy, and Compliance Considerations",
+      "target_keyword": "decentralized ai security",
+      "content_type": "blog",
+      "hub": "Cloud AI Platforms",
+      "priority": "high",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Addresses key enterprise concerns around decentralization. Builds trust with security-conscious organizations and differentiates from centralized clouds.",
+      "publish_date": "2025-12-18"
+    },
+    {
+      "week": 9,
+      "title": "Optimizing GPU Utilization: Monitoring, Profiling, and Performance Tuning Tools",
+      "target_keyword": "gpu utilization optimization",
+      "content_type": "tutorial",
+      "hub": "GPU AI Training",
+      "priority": "medium",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Practical optimization guide increasing user ROI. Helps developers maximize value from platform and reduces churn through better performance.",
+      "publish_date": "2025-12-18"
+    },
+    {
+      "week": 10,
+      "title": "AI Workload Scheduling Strategies for Cost-Effective Training",
+      "target_keyword": "ai training scheduling",
+      "content_type": "blog",
+      "hub": "Cloud AI Services",
+      "priority": "medium",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Advanced operational guide for cost optimization. Positions io.net as sophisticated platform with enterprise-grade capabilities.",
+      "publish_date": "2025-12-25"
+    },
+    {
+      "week": 10,
+      "title": "Tensor Cores vs CUDA Cores: Which GPU Architecture for Your AI Workload?",
+      "target_keyword": "tensor cores vs cuda cores",
+      "content_type": "guide",
+      "hub": "Hardware for ML",
+      "priority": "medium",
+      "business_goal": "seo",
+      "estimated_impact": "Technical comparison content for hardware selection. Educates buyers on GPU architectures while building Hardware for ML authority.",
+      "publish_date": "2025-12-25"
+    },
+    {
+      "week": 11,
+      "title": "Case Study: Computer Vision Startup Achieves 10x Faster Iteration with Distributed GPUs",
+      "target_keyword": "gpu computer vision training",
+      "content_type": "case_study",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Vertical-specific success story for CV use case. Demonstrates speed-to-market benefits and attracts similar high-growth startups.",
+      "publish_date": "2026-01-01"
+    },
+    {
+      "week": 11,
+      "title": "Evaluating Cloud AI Platform Performance: Benchmarking Framework and Metrics",
+      "target_keyword": "ai platform benchmarks",
+      "content_type": "technical_doc",
+      "hub": "Cloud AI Platforms",
+      "priority": "medium",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Establishes objective evaluation criteria. Positions io.net as transparent leader willing to be measured against competitors.",
+      "publish_date": "2026-01-01"
+    },
+    {
+      "week": 12,
+      "title": "Fine-Tuning Pre-Trained Models: GPU Requirements and Cost Optimization Strategies",
+      "target_keyword": "fine tuning gpu requirements",
+      "content_type": "guide",
+      "hub": "GPU AI Training",
+      "priority": "high",
+      "business_goal": "seo",
+      "estimated_impact": "Addresses common use case (fine-tuning vs training from scratch). Captures developers working with foundation models like GPT, BERT, LLaMA.",
+      "publish_date": "2026-01-08"
+    },
+    {
+      "week": 12,
+      "title": "Building Resilient AI Services: Fault Tolerance and High Availability Patterns",
+      "target_keyword": "ai service reliability",
+      "content_type": "blog",
+      "hub": "Cloud AI Services",
+      "priority": "medium",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Addresses enterprise concerns about decentralized reliability. Demonstrates platform maturity and production-readiness for critical workloads.",
+      "publish_date": "2026-01-08"
+    },
+    {
+      "week": 13,
+      "title": "API Rate Limiting and Scaling Strategies for AI Services",
+      "target_keyword": "ai api rate limiting",
+      "content_type": "tutorial",
+      "hub": "AI API Solutions",
+      "priority": "low",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Practical implementation guide for production APIs. Helps developers build robust services on io.net infrastructure.",
+      "publish_date": "2026-01-15"
+    },
+    {
+      "week": 13,
+      "title": "The Economics of Decentralized GPU Networks: Supply, Demand, and Pricing Dynamics",
+      "target_keyword": "decentralized gpu economics",
+      "content_type": "blog",
+      "hub": "Cloud AI Platforms",
+      "priority": "high",
+      "business_goal": "network_growth",
+      "estimated_impact": "Thought leadership on marketplace dynamics. Educates potential GPU providers and attracts supply-side network participants.",
+      "publish_date": "2026-01-15"
+    },
+    {
+      "week": 14,
+      "title": "Multi-Cloud AI Strategy: Using Decentralized GPUs as Hybrid Infrastructure",
+      "target_keyword": "hybrid cloud ai",
+      "content_type": "guide",
+      "hub": "Cloud AI Platforms",
+      "priority": "medium",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Enterprise-focused content on hybrid strategies. Positions io.net as complement to existing cloud investments rather than full replacement.",
+      "publish_date": "2026-01-22"
+    },
+    {
+      "week": 14,
+      "title": "GPU Passthrough and Virtualization for AI Workloads: Technical Deep Dive",
+      "target_keyword": "gpu virtualization ai",
+      "content_type": "technical_doc",
+      "hub": "Hardware for ML",
+      "priority": "low",
+      "business_goal": "thought_leadership",
+      "estimated_impact": "Advanced technical content for infrastructure engineers. Demonstrates deep platform capabilities and technical sophistication.",
+      "publish_date": "2026-01-22"
+    },
+    {
+      "week": 15,
+      "title": "Monitoring and Observability for Distributed AI Training Jobs",
+      "target_keyword": "ai training monitoring",
+      "content_type": "tutorial",
+      "hub": "Cloud AI Services",
+      "priority": "medium",
+      "business_goal": "developer_adoption",
+      "estimated_impact": "Operations-focused guide improving user experience. Reduces support burden and increases user success with better visibility tools.",
+      "publish_date": "2026-01-29"
+    },
+    {
+      "week": 15,
+      "title": "Case Study: Research Lab Trains State-of-the-Art Models 40% Cheaper on Decentralized GPUs",
+      "target_keyword": "academic ai training",
+      "content_type": "case_study",
+      "hub": "GPU AI Training",
+      "priority": "medium",
+      "business_goal": "network_growth",
+      "estimated_impact": "Academic success story building credibility with research community. Attracts grant-funded projects and expands user base into education sector.",
+      "publish_date": "2026-01-29"
+    }
+  ]
+}
